@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # Set working directory to the folder containing the model and video file
-os.chdir(r"D:\Desktop\yolov5safetyhelmet")
+os.chdir(r"C:\Mwafy\uni\GP\best final")
 
 # Ensure output directory exists
 if not os.path.exists("output"):
@@ -18,8 +18,7 @@ except Exception as e:
     exit()
 
 # Load the video file
-video_file = "http://192.168.1.205:4747/video" 
-cap = cv2.VideoCapture(video_file)
+cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     print("Error: Could not open video file.")
@@ -32,7 +31,11 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 if fps == 0:
     fps = 30  # fallback
 
-out = cv2.VideoWriter(output_file, fourcc, fps, (1020, 600))
+
+
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
 
 # Define font for labeling
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -44,7 +47,7 @@ while True:
     if not ret:
         break
 
-    frame = cv2.resize(frame, (1020, 600))
+    frame = cv2.resize(frame, (1280, 720))
 
     # Run YOLO detection
     results = model(frame)
@@ -100,16 +103,13 @@ while True:
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 100, 255), 2)
         cv2.putText(frame, 'Worker', (x1, y1 - 10), font, 0.5, (255, 0, 255), 2)
 
-    out.write(frame)
-    cv2.imshow('frame', frame)
-    frame_idx += 1
+   
 
     # Stop on key press
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
-out.release()
 cv2.destroyAllWindows()
 
 print("Processing completed successfully. Output saved as", output_file)
